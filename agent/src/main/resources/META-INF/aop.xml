@@ -1,0 +1,7 @@
+<aspectj>
+    <aspects>
+        <aspect name="de.mirkosertic.whobrokeit.agent.ConstructorInvocationAspect"/>
+    </aspects>
+    <weaver options="-verbose">
+    </weaver>
+</aspectj>
