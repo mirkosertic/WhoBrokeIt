@@ -11,6 +11,8 @@
     <modules>
         <module>core</module>
         <module>agent</module>
+        <module>maven</module>
+        <module>git</module>
         <module>runner</module>
     </modules>
 
@@ -42,6 +44,16 @@
             <dependency>
                 <groupId>de.mirkosertic.whobrokeit</groupId>
                 <artifactId>runner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.mirkosertic.whobrokeit</groupId>
+                <artifactId>maven</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.mirkosertic.whobrokeit</groupId>
+                <artifactId>git</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
