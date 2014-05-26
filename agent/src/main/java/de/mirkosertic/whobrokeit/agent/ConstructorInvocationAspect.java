@@ -8,9 +8,6 @@ import org.aspectj.lang.annotation.Before;
 @Aspect
 public class ConstructorInvocationAspect {
 
-    public ConstructorInvocationAspect() {
-    }
-
     @Before("initialization(*.new(..)) && !within(ConstructorInvocationAspect)")
     public void afterConstructor(JoinPoint thisJoinPoint) {
         Class theConstructedClass = thisJoinPoint.getSignature().getDeclaringType();

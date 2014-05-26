@@ -1,6 +1,7 @@
 <aspectj>
     <aspects>
         <aspect name="de.mirkosertic.whobrokeit.agent.ConstructorInvocationAspect"/>
+        <aspect name="de.mirkosertic.whobrokeit.agent.TestExecutionAspect"/>
     </aspects>
     <weaver options="-verbose">
     </weaver>

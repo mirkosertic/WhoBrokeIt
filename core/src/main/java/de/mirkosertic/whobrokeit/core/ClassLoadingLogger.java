@@ -1,6 +1,13 @@
 package de.mirkosertic.whobrokeit.core;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ClassLoadingLogger {
+
+    private final static Logger LOGGER = Logger.getLogger(ClassLoadingLogger.class.getName());
 
     private static final ClassLoadingLogger INSTANCE = new ClassLoadingLogger();
 
@@ -13,8 +20,8 @@ public class ClassLoadingLogger {
     private ClassLoadingLogger() {
     }
 
-    public void initializeForRun() {
-        statistics = new Statistics();
+    public void initializeForRun(Class aTargetClass, Method aTestMethod) {
+        statistics = new Statistics(aTargetClass, aTestMethod);
     }
 
     public boolean isStatisticsEnabled() {
@@ -26,11 +33,12 @@ public class ClassLoadingLogger {
     }
 
     public void finishRun() {
-        System.out.println("Used classes in this run");
-        System.out.println("========================");
-        for (Class theClass : statistics.getUsedClasses()) {
-            System.out.println(theClass.getName());
+        try {
+            statistics.writeTo(new File("C:\\Temp\\logs"));
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error writing log file", e);
+        } finally {
+            statistics = null;
         }
-        statistics = null;
     }
 }
