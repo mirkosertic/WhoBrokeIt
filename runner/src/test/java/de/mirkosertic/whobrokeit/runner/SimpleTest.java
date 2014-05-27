@@ -15,6 +15,5 @@ public class SimpleTest {
     public void testGreet() {
         UnderTestClass theClassUnderTest = new UnderTestClass();
         assertEquals("hello", theClassUnderTest.greet());
-        throw new RuntimeException("This is strange!");
     }
 }
