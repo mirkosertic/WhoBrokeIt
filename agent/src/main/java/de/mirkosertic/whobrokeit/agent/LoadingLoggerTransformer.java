@@ -21,7 +21,7 @@ public class LoadingLoggerTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader aLoader, String aClassName, Class<?> aClassBeingRedifined, ProtectionDomain aProtectionDomain, byte[] aClassData) throws IllegalClassFormatException {
-        LOGGER.info("Retransforming class with AspectJ : " + aClassName.replace('/', '.'));
+        LOGGER.log(Level.FINEST, "Retransforming class with AspectJ : " + aClassName.replace('/', '.'));
         try {
             return aj.preProcess(aClassName, aClassData, aLoader, aProtectionDomain);
         } catch (Exception e) {

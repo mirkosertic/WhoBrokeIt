@@ -42,8 +42,18 @@ public class ClassLoadingLogger {
         }
     }
 
-    public void initializeForRun(Class aTargetClass, Method aTestMethod) {
-        statistics = new Statistics(aTargetClass, aTestMethod);
+    public void initializeForRun(Class aTargetClass) {
+        if (statistics == null) {
+            statistics = new Statistics(aTargetClass);
+        }
+    }
+
+    public void exceptionExpectedButNotThrown(Class<?> aExceptionClass) {
+        System.out.println("Expected but not thrown : "+aExceptionClass);
+    }
+
+    public void unexpectedExceptionThrown(Exception aException) {
+        System.out.println("Unexpected exception thrown : "+aException);
     }
 
     public boolean isStatisticsEnabled() {
@@ -54,9 +64,9 @@ public class ClassLoadingLogger {
         return statistics;
     }
 
-    public void finishRun() {
+    public void finishRun(Method aTestmethod) {
         try {
-            statistics.writeTo(new File("C:\\Temp\\logs"), sourceRepository, versionControlSystem);
+            statistics.writeTo(new File("C:\\Temp\\logs"), sourceRepository, versionControlSystem, aTestmethod);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error writing log file", e);
         } finally {

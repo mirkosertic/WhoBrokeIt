@@ -16,19 +16,17 @@ public class Statistics {
 
     private Set<Class> usedClasses;
     private Class targetClass;
-    private Method targetMethod;
 
-    Statistics(Class aTargetClass, Method aTestMethod) {
+    Statistics(Class aTargetClass) {
         usedClasses = new HashSet<>();
         targetClass = aTargetClass;
-        targetMethod = aTestMethod;
     }
 
     public void recordConstructorUsageOf(Class aConstructedClass) {
         usedClasses.add(aConstructedClass);
     }
 
-    public void writeTo(File aSourceFile, SourceRepository aSourceRepository, VersionControlSystem aVersionControlSystem)
+    public void writeTo(File aSourceFile, SourceRepository aSourceRepository, VersionControlSystem aVersionControlSystem, Method aTestMethod)
             throws IOException {
 
         List<Class> theUsedClasses = new ArrayList<>();
@@ -38,11 +36,11 @@ public class Statistics {
         Collections.sort(theUsedClasses, new Comparator<Class>() {
             @Override
             public int compare(Class o1, Class o2) {
-                return o1.getCanonicalName().compareTo(o2.getCanonicalName());
+                return o1.getName().compareTo(o2.getName());
             }
         });
 
-        String theFileName = targetClass.getName() + "_" + targetMethod.getName();
+        String theFileName = targetClass.getName() + "_" + aTestMethod.getName();
         File theLogFile = new File(aSourceFile, theFileName.replace('.', '_') + ".log");
         PrintWriter thePrintWriter = new PrintWriter(new FileWriter(theLogFile));
         for (Class theClass : theUsedClasses) {
@@ -50,10 +48,10 @@ public class Statistics {
             if (theClassSourceFile != null) {
                 Version theVersion = aVersionControlSystem.computeVersionFor(aSourceRepository, theClassSourceFile);
                 if (theVersion != null) {
-                    thePrintWriter.println(theClass.getCanonicalName() + ";" + theVersion.computeAsString());
+                    thePrintWriter.println(theClass.getName() + ";" + theVersion.computeAsString());
                 } else {
                     // Not a versioned file
-                    thePrintWriter.println(theClass.getCanonicalName() + ";");
+                    thePrintWriter.println(theClass.getName() + ";");
                 }
             } else {
                 // No file found, we do nothing
