@@ -8,7 +8,7 @@ import java.io.File;
 public class MavenSourceRepository extends CompositeSourceRepository {
 
     public MavenSourceRepository() {
-        File theBaseDir = new File("C:\\work\\WhoBrokeIt\\runner");
+        File theBaseDir = new File("C:\\source\\idea_projects\\WhoBrokeIt\\runner");
         File theMainSources = new File(theBaseDir, "src\\main\\java");
         if (theMainSources.exists()) {
             add(new DirectorySourceRepository(theMainSources));

@@ -27,12 +27,34 @@ public class GitVersionControlSystem implements VersionControlSystem {
     }
 
     @Override
+    public Version parseVersionFrom(String aVersionStringInfo) {
+        return GitVersion.parse(aVersionStringInfo);
+    }
+
+    private File discoverGitRepositoryFrom(File aFile) {
+        File theGitRepo = new File(aFile,".git");
+        if (theGitRepo.exists()) {
+            return theGitRepo;
+        }
+        if (aFile.getParentFile() != null) {
+            return discoverGitRepositoryFrom(aFile.getParentFile());
+        }
+        return null;
+    }
+
+    @Override
     public Version computeVersionFor(SourceRepository aSourceRepository, File aFile) {
         try {
             Repository theRepository = repositories.get(aSourceRepository);
             if (theRepository == null) {
                 FileRepositoryBuilder theBuilder = new FileRepositoryBuilder();
-                theRepository = theBuilder.setGitDir(new File("C:\\work\\WhoBrokeIt\\.git")).readEnvironment()
+
+                File theGitRepository = discoverGitRepositoryFrom(aFile);
+                if (theGitRepository == null) {
+                    throw new RuntimeException("Not part of a GIT repository : "+aFile);
+                }
+
+                theRepository = theBuilder.setGitDir(theGitRepository).readEnvironment()
                         .findGitDir().build();
                 repositories.put(aSourceRepository, theRepository);
             }

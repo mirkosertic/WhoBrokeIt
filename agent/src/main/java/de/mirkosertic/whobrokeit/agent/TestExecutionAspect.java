@@ -67,6 +67,7 @@ public class TestExecutionAspect {
                         theLogger.unexpectedExceptionThrown(e);
                     }
                 }
+                throw e;
             } finally {
                 theLogger.finishRun(theMethodSignature.getMethod());
             }

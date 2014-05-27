@@ -1,8 +1,11 @@
 package de.mirkosertic.whobrokeit.core;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,11 +29,11 @@ public class ClassLoadingLogger {
     private ClassLoadingLogger() {
         sourceRepository = new CompositeSourceRepository();
         ServiceLoader<SourceRepository> theRepositoryLoader = ServiceLoader.load(SourceRepository.class);
-        for (Iterator<SourceRepository> theRepIterator = theRepositoryLoader.iterator(); theRepIterator.hasNext();) {
+        for (Iterator<SourceRepository> theRepIterator = theRepositoryLoader.iterator(); theRepIterator.hasNext(); ) {
             sourceRepository.add(theRepIterator.next());
         }
         ServiceLoader<VersionControlSystem> theVCSLoader = ServiceLoader.load(VersionControlSystem.class);
-        for (Iterator<VersionControlSystem> theVCSIterator = theVCSLoader.iterator(); theVCSIterator.hasNext();) {
+        for (Iterator<VersionControlSystem> theVCSIterator = theVCSLoader.iterator(); theVCSIterator.hasNext(); ) {
             if (versionControlSystem == null) {
                 versionControlSystem = theVCSIterator.next();
             } else {
@@ -49,11 +52,15 @@ public class ClassLoadingLogger {
     }
 
     public void exceptionExpectedButNotThrown(Class<?> aExceptionClass) {
-        System.out.println("Expected but not thrown : "+aExceptionClass);
+        if (statistics != null) {
+            statistics.markFailed();
+        }
     }
 
     public void unexpectedExceptionThrown(Exception aException) {
-        System.out.println("Unexpected exception thrown : "+aException);
+        if (statistics != null) {
+            statistics.markFailed();
+        }
     }
 
     public boolean isStatisticsEnabled() {
@@ -65,10 +72,31 @@ public class ClassLoadingLogger {
     }
 
     public void finishRun(Method aTestmethod) {
+        File theLogDirectory = new File("C:\\Temp\\logs");
         try {
-            statistics.writeTo(new File("C:\\Temp\\logs"), sourceRepository, versionControlSystem, aTestmethod);
+            if (statistics.isFailed()) {
+
+                StringWriter theStringWriter = new StringWriter();
+                PrintWriter theResultWriter = new PrintWriter(theStringWriter);
+
+                List<StatisticEntry> theOldLog = statistics.readEntriesFor(theLogDirectory, aTestmethod, versionControlSystem);
+                for (StatisticEntry theEntry : theOldLog) {
+                    Class theClass = Class.forName(theEntry.getClazz());
+                    File theSourceFile = sourceRepository.locateFileForClass(theClass);
+                    Version theVersionInRepository = versionControlSystem.computeVersionFor(sourceRepository, theSourceFile);
+                    if (!theVersionInRepository.isIdenticalWith(theEntry.getVersion())) {
+                        theResultWriter.println("Version change detected in " + theSourceFile + " latest change in repository was by " + theVersionInRepository.getAuthor());
+                    }
+                }
+                theResultWriter.flush();
+
+                System.out.println("Possible changes what broke the test : " + theStringWriter.toString());
+            } else {
+                // Write out the new log
+                statistics.writeTo(theLogDirectory, sourceRepository, versionControlSystem, aTestmethod);
+            }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error writing log file", e);
+            LOGGER.log(Level.SEVERE, "Error processing log file", e);
         } finally {
             statistics = null;
         }
