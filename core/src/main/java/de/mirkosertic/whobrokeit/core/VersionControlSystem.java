@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface VersionControlSystem {
 
-    Version computeVersionFor(File aFile);
+    Version computeVersionFor(SourceRepository aSourceRepository, File aFile);
 }

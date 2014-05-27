@@ -48,7 +48,7 @@ public class Statistics {
         for (Class theClass : theUsedClasses) {
             File theClassSourceFile = aSourceRepository.locateFileForClass(theClass);
             if (theClassSourceFile != null) {
-                Version theVersion = aVersionControlSystem.computeVersionFor(theClassSourceFile);
+                Version theVersion = aVersionControlSystem.computeVersionFor(aSourceRepository, theClassSourceFile);
                 if (theVersion != null) {
                     thePrintWriter.println(theClass.getCanonicalName() + ";" + theVersion.computeAsString());
                 } else {
