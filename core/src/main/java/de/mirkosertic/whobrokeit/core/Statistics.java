@@ -1,6 +1,11 @@
 package de.mirkosertic.whobrokeit.core;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,13 +28,26 @@ public class Statistics {
     public void recordConstructorUsageOf(Class aConstructedClass) {
         usedClasses.add(aConstructedClass);
     }
+    
+    File computeLogFileFor(File aLogDirecotry, Method aTestMethod) {
+        File theDirectoryToWriteTo = aLogDirecotry;
+        String theClassName = targetClass.getName();
+        int p = theClassName.indexOf('.');
+        while(p>0) {
+            String thePackageName = theClassName.substring(0, p);
+            theDirectoryToWriteTo = new File(theDirectoryToWriteTo, thePackageName);
+            theDirectoryToWriteTo.mkdirs();
+            theClassName = theClassName.substring(p+1);
+            p = theClassName.indexOf('.');
+        }
+        return new File(theDirectoryToWriteTo, aTestMethod.getName()+".log");
+    }    
 
     public List<StatisticEntry> readEntriesFor(File aLogDirectory, Method aTestMethod, VersionControlSystem aVersionControlSystem) throws IOException {
 
         List<StatisticEntry> theResult = new ArrayList<>();
 
-        String theFileName = targetClass.getName() + "_" + aTestMethod.getName();
-        File theLogFile = new File(aLogDirectory, theFileName.replace('.', '_') + ".log");
+        File theLogFile = computeLogFileFor(aLogDirectory, aTestMethod);
         try(BufferedReader theReader = new BufferedReader(new FileReader(theLogFile))) {
             String theLine = theReader.readLine();
             theResult.add(StatisticEntry.parse(theLine, aVersionControlSystem));
@@ -52,8 +70,8 @@ public class Statistics {
             }
         });
 
-        String theFileName = targetClass.getName() + "_" + aTestMethod.getName();
-        File theLogFile = new File(aLogDirectory, theFileName.replace('.', '_') + ".log");
+        File theLogFile = computeLogFileFor(aLogDirectory, aTestMethod);
+        
         PrintWriter thePrintWriter = new PrintWriter(new FileWriter(theLogFile));
         for (Class theClass : theUsedClasses) {
             File theClassSourceFile = aSourceRepository.locateFileForClass(theClass);
