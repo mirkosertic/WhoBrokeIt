@@ -14,30 +14,12 @@ public class Configuration {
 
     private static Configuration CONFIGURATION;
 
-    private final CompositeSourceRepository sourceRepository;
+    private CompositeSourceRepository sourceRepository;
     private VersionControlSystem versionControlSystem;
     private File projectBaseDir;
     private File logDir;
 
     private Configuration() {
-        sourceRepository = new CompositeSourceRepository();
-        ServiceLoader<SourceRepository> theRepositoryLoader = ServiceLoader.load(SourceRepository.class);
-        for (Iterator<SourceRepository> theRepIterator = theRepositoryLoader.iterator(); theRepIterator.hasNext(); ) {
-            SourceRepository theSourceRepository = theRepIterator.next();
-            theSourceRepository.configure(this);
-            sourceRepository.add(theSourceRepository);
-        }
-        ServiceLoader<VersionControlSystem> theVCSLoader = ServiceLoader.load(VersionControlSystem.class);
-        for (Iterator<VersionControlSystem> theVCSIterator = theVCSLoader.iterator(); theVCSIterator.hasNext(); ) {
-            if (versionControlSystem == null) {
-                versionControlSystem = theVCSIterator.next().configure(this);
-            } else {
-                throw new IllegalStateException("Only one VCS adapter is supported at runtime!");
-            }
-        }
-        if (versionControlSystem == null) {
-            throw new IllegalArgumentException("You have to add one VCS adapter implementation");
-        }
     }
 
     public void initialize(String aAgentArguments) {
@@ -59,6 +41,25 @@ public class Configuration {
         }
         LOGGER.info("WhoBrokeIt ProjectDir set to "+projectBaseDir);
         LOGGER.info("WhoBrokeIt LogDir set to "+logDir);
+
+        sourceRepository = new CompositeSourceRepository();
+        ServiceLoader<SourceRepository> theRepositoryLoader = ServiceLoader.load(SourceRepository.class);
+        for (Iterator<SourceRepository> theRepIterator = theRepositoryLoader.iterator(); theRepIterator.hasNext(); ) {
+            SourceRepository theSourceRepository = theRepIterator.next();
+            theSourceRepository.configure(this);
+            sourceRepository.add(theSourceRepository);
+        }
+        ServiceLoader<VersionControlSystem> theVCSLoader = ServiceLoader.load(VersionControlSystem.class);
+        for (Iterator<VersionControlSystem> theVCSIterator = theVCSLoader.iterator(); theVCSIterator.hasNext(); ) {
+            if (versionControlSystem == null) {
+                versionControlSystem = theVCSIterator.next().configure(this);
+            } else {
+                throw new IllegalStateException("Only one VCS adapter is supported at runtime!");
+            }
+        }
+        if (versionControlSystem == null) {
+            throw new IllegalArgumentException("You have to add one VCS adapter implementation");
+        }
     }
 
     public SourceRepository getSourceRepository() {
