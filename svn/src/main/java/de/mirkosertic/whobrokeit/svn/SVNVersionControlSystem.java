@@ -1,5 +1,6 @@
 package de.mirkosertic.whobrokeit.svn;
 
+import de.mirkosertic.whobrokeit.core.Configuration;
 import de.mirkosertic.whobrokeit.core.SourceRepository;
 import de.mirkosertic.whobrokeit.core.Version;
 import de.mirkosertic.whobrokeit.core.VersionControlSystem;
@@ -17,6 +18,11 @@ public class SVNVersionControlSystem implements VersionControlSystem {
         ISVNAuthenticationManager theAuthManager = SVNWCUtil.createDefaultAuthenticationManager();
 
         svnClientManager = SVNClientManager.newInstance(theOptions, theAuthManager);
+    }
+
+    @Override
+    public SVNVersionControlSystem configure(Configuration aConfiguration) {
+        return this;
     }
 
     @Override

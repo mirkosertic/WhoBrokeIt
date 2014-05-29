@@ -14,35 +14,21 @@ public class ClassLoadingLogger {
 
     private final static Logger LOGGER = Logger.getLogger(ClassLoadingLogger.class.getName());
 
-    private static final ClassLoadingLogger INSTANCE = new ClassLoadingLogger();
+    private static ClassLoadingLogger INSTANCE;
 
     private Statistics statistics;
 
-    private CompositeSourceRepository sourceRepository;
-
-    private VersionControlSystem versionControlSystem;
+    private final Configuration configuration;
 
     public static ClassLoadingLogger getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ClassLoadingLogger(Configuration.getInstance());
+        }
         return INSTANCE;
     }
 
-    private ClassLoadingLogger() {
-        sourceRepository = new CompositeSourceRepository();
-        ServiceLoader<SourceRepository> theRepositoryLoader = ServiceLoader.load(SourceRepository.class);
-        for (Iterator<SourceRepository> theRepIterator = theRepositoryLoader.iterator(); theRepIterator.hasNext(); ) {
-            sourceRepository.add(theRepIterator.next());
-        }
-        ServiceLoader<VersionControlSystem> theVCSLoader = ServiceLoader.load(VersionControlSystem.class);
-        for (Iterator<VersionControlSystem> theVCSIterator = theVCSLoader.iterator(); theVCSIterator.hasNext(); ) {
-            if (versionControlSystem == null) {
-                versionControlSystem = theVCSIterator.next();
-            } else {
-                throw new IllegalStateException("Only one VCS adapter is supported at runtime!");
-            }
-        }
-        if (versionControlSystem == null) {
-            throw new IllegalArgumentException("You have to add one VCS adapter implementation");
-        }
+    private ClassLoadingLogger(Configuration aConfiguration) {
+        configuration = aConfiguration;
     }
 
     public void initializeForRun(Class aTargetClass) {
@@ -72,18 +58,23 @@ public class ClassLoadingLogger {
     }
 
     public void finishRun(Method aTestmethod) {
-        File theLogDirectory = new File("C:\\Temp\\logs");
         try {
+
+            VersionControlSystem theVersionControlSystem = configuration.getVersionControlSystem();
+            SourceRepository theSourceRepository = configuration.getSourceRepository();
+
+            File theLogDirectory = configuration.getLogDir();
+
             if (statistics.isFailed()) {
 
                 StringWriter theStringWriter = new StringWriter();
                 PrintWriter theResultWriter = new PrintWriter(theStringWriter);
 
-                List<StatisticEntry> theOldLog = statistics.readEntriesFor(theLogDirectory, aTestmethod, versionControlSystem);
+                List<StatisticEntry> theOldLog = statistics.readEntriesFor(theLogDirectory, aTestmethod, theVersionControlSystem);
                 for (StatisticEntry theEntry : theOldLog) {
                     Class theClass = Class.forName(theEntry.getClazz());
-                    File theSourceFile = sourceRepository.locateFileForClass(theClass);
-                    Version theVersionInRepository = versionControlSystem.computeVersionFor(sourceRepository, theSourceFile);
+                    File theSourceFile = theSourceRepository.locateFileForClass(theClass);
+                    Version theVersionInRepository = theVersionControlSystem.computeVersionFor(theSourceRepository, theSourceFile);
                     if (!theVersionInRepository.isIdenticalWith(theEntry.getVersion())) {
                         theResultWriter.println("Version change detected in " + theSourceFile + " latest change in repository was by " + theVersionInRepository.getAuthor());
                     }
@@ -93,7 +84,7 @@ public class ClassLoadingLogger {
                 System.out.println("Possible changes what broke the test : " + theStringWriter.toString());
             } else {
                 // Write out the new log
-                statistics.writeTo(theLogDirectory, sourceRepository, versionControlSystem, aTestmethod);
+                statistics.writeTo(theLogDirectory, theSourceRepository, theVersionControlSystem, aTestmethod);
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error processing log file", e);

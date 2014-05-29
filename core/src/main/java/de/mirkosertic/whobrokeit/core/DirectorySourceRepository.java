@@ -11,6 +11,11 @@ public class DirectorySourceRepository implements SourceRepository {
     }
 
     @Override
+    public DirectorySourceRepository configure(Configuration aConfiguration) {
+        return this;
+    }
+
+    @Override
     public File locateFileForClass(Class aClass) {
         File theStartDirectory = sourceDirectory;
         String theClassName = aClass.getName();

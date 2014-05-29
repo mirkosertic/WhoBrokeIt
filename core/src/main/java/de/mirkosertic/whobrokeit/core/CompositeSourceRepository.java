@@ -12,6 +12,11 @@ public class CompositeSourceRepository implements SourceRepository {
         repositories = new ArrayList<>();
     }
 
+    @Override
+    public CompositeSourceRepository configure(Configuration aConfiguration) {
+        return this;
+    }
+
     public void add(SourceRepository aRepository) {
         repositories.add(aRepository);
     }

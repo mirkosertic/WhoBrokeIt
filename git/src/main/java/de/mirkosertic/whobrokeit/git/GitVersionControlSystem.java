@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.mirkosertic.whobrokeit.core.Configuration;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -24,6 +25,11 @@ public class GitVersionControlSystem implements VersionControlSystem {
 
     public GitVersionControlSystem() {
         repositories = new HashMap<>();
+    }
+
+    @Override
+    public GitVersionControlSystem configure(Configuration aConfiguration) {
+        return this;
     }
 
     @Override

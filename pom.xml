@@ -14,7 +14,9 @@
         <module>maven</module>
         <module>git</module>
         <module>svn</module>
-        <module>runner</module>
+        <module>agentmavengit</module>
+        <module>agentmavensvn</module>
+        <module>example</module>
     </modules>
 
     <build>
