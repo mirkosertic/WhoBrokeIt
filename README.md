@@ -24,9 +24,9 @@ and who broke the test.
 ## Configuration ##
 As stated before, WhoBrokeIt is a simple JavaAgent. This Agent is configured using Java VM parameters the following way:
 
--javaagent:<fullpathtoagent.jar>
--Dwhobrokeit.projectDir=<the directory where your maven pom.xml is located>
--Dwhobrokeit.logDir=<the directory where the log files should be written>
++ -javaagent:fullpathtoagent.jar
++ -Dwhobrokeit.projectDir=the directory where your maven pom.xml is located
++ -Dwhobrokeit.logDir=the directory where the log files should be written
 
 WhoBrokeIt comes in different flavors. There is an agent.jar file for Maven and Git support, and there is another
 agent.jar file for Maven and SVN support. You have to choose the right one for your project.
