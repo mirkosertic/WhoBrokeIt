@@ -16,10 +16,5 @@
             <groupId>de.mirkosertic.whobrokeit</groupId>
             <artifactId>core</artifactId>
         </dependency>
-        <dependency>
-        	<groupId>org.apache.maven</groupId>
-        	<artifactId>maven-core</artifactId>
-        	<version>3.2.1</version>
-        </dependency>
     </dependencies>
 </project>

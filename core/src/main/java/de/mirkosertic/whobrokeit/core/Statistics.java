@@ -40,6 +40,8 @@ public class Statistics {
             theClassName = theClassName.substring(p+1);
             p = theClassName.indexOf('.');
         }
+        theDirectoryToWriteTo = new File(theDirectoryToWriteTo, theClassName);
+        theDirectoryToWriteTo.mkdirs();
         return new File(theDirectoryToWriteTo, aTestMethod.getName()+".log");
     }    
 

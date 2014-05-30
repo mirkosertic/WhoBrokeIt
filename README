@@ -1,3 +1,0 @@
-WhoBrokeIt is a simple library to detect which VCS commit broke a particular unit test.
-
-It is based on JUnit, AspectJ and some vodoo-style runtime bytecode instrumentation.
